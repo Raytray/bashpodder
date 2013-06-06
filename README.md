@@ -15,11 +15,13 @@ latest file will be downloaded.
 
 ## Raymond Tang ##
 
-I removed some of the features that I did not use (playlist/folder) and added a cleaner.sh file.
+I removed some of the features that I did not use (playlist/folder)  
+I also added a cleaner.sh task and a notification task via Notify My Android.
+
+To use the notification task, the nma.sh must be placed or symbolically linked into your path.
 
 I kept the same feed format was Ellen (url foldername) but instead used foldername as a prepending filename.  
 This was because it was easier to play and view the entire podcast collection at the same time. Especially if it was not too large.
 
-My usecase is to place this onto a raspberrypi, cronjob it daily to pull podcasts.
+My usecase is to place this onto a raspberrypi, cronjob it daily to pull podcasts.  
 Cronjob cleaner.sh weekly to remove month old podcasts.
-Cronjob new podcasts notifications every morning and shoot a text message or email.

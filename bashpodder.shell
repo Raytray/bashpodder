@@ -35,6 +35,7 @@ do
         if ! grep "$filename" podcast.log > /dev/null
         then
             wget -t 10 -U BashPodder -c -q -O $datadir/$dname-$(echo "$url" | awk -F'/' {'print $NF'} | awk -F'=' {'print $NF'} | awk -F'?' {'print $1'}) "$url"
+            `nma.sh "BashPodder" "Fetched new $dname" "$filename"`
         fi
     done
 done < bp.conf
