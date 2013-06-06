@@ -28,14 +28,13 @@ do
     podcast=$(echo $podcastfields | cut -d' ' -f1)
     dname=$(echo $podcastfields | cut -d' ' -f2)
     file=$(xsltproc parse_enclosure.xsl $podcast 2> /dev/null | head -n1 || wget -q $podcast -O - | tr '\r' '\n' | tr \' \" | sed -n 's/.*url="\([^"]*\)".*/\1/p')
-    mkdir -p $datadir/$dname
     for url in $file
     do
-        filename=$(echo $url | awk -F'/' '{print $NF}')
+        filename=$dname-$(echo $url | awk -F'/' '{print $NF}')
         echo $filename >> temp.log
         if ! grep "$filename" podcast.log > /dev/null
         then
-            wget -t 10 -U BashPodder -c -q -O $datadir/$dname/$(echo "$url" | awk -F'/' {'print $NF'} | awk -F'=' {'print $NF'} | awk -F'?' {'print $1'}) "$url"
+            wget -t 10 -U BashPodder -c -q -O $datadir/$dname-$(echo "$url" | awk -F'/' {'print $NF'} | awk -F'=' {'print $NF'} | awk -F'?' {'print $1'}) "$url"
         fi
     done
 done < bp.conf
