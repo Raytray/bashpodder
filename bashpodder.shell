@@ -13,28 +13,33 @@
 # Make script crontab friendly:
 cd $(dirname $0)
 
+# Declaring start time for logging purposes.
+echo $(date)
+
 # datadir is the directory you want podcasts saved to:
 datadir=$HOME/Dropbox/Podcasts
+bpconf=$HOME/.bp.conf
 
 # create datadir if necessary:
 mkdir -p $datadir
 
-# Delete any temp file:
-rm -f temp.log
-
 # Read the bp.conf file and wget any url not already in the podcast.log file:
 while read podcastfields
 do
-    podcast=$(echo $podcastfields | cut -d' ' -f1)
-    dname=$(echo $podcastfields | cut -d' ' -f2)
-    file=$(xsltproc parse_enclosure.xsl $podcast 2> /dev/null | head -n1 || wget -q $podcast -O - | tr '\r' '\n' | tr \' \" | sed -n 's/.*url="\([^"]*\)".*/\1/p')
+    podcast_url=$(echo $podcastfields | cut -d' ' -f1)
+    radio_name=$(echo $podcastfields | cut -d' ' -f2)
+    echo "Checking $radio_name"
+    file=$(xsltproc parse_enclosure.xsl $podcast_url 2> /dev/null | head -n1 || wget -q $podcast_url -O - | tr '\r' '\n' | tr \' \" | sed -n 's/.*url="\([^"]*\)".*/\1/p')
     for url in $file
     do
-        filename=$dname-$(echo $url | awk -F'/' '{print $NF}')
+        filename=$radio_name-$(echo $url | awk -F'/' '{print $NF}')
         if [[ ! -f $datadir/$filename  ]]
         then
-            wget -t 10 -U BashPodder -c -q -O $datadir/$dname-$(echo "$url" | awk -F'/' {'print $NF'} | awk -F'=' {'print $NF'} | awk -F'?' {'print $1'}) "$url"
-            `nma.sh "BashPodder" "Fetched new $dname" "$filename" > /dev/null`
+            echo "Downloading $filename"
+            wget -t 10 -U BashPodder -c -q -O $datadir/$radio_name-$(echo "$url" | awk -F'/' {'print $NF'} | awk -F'=' {'print $NF'} | awk -F'?' {'print $1'}) "$url"
+            #Send notification via notify my android.
+            #Requires nma.sh found here: https://www.notifymyandroid.com/dev.jsp
+            `nma.sh "BashPodder" "Fetched new $radio_name" "$filename" > /dev/null`
         fi
     done
-done < bp.conf
+done < $bpconf
